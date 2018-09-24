@@ -7,11 +7,18 @@ function makeGraphs(error, countryData) {
     var ndx = crossfilter(countryData);
     //Declaring color scale to be used in all charts
     var colorScale = d3.scale.ordinal().range(["#31FFAB", "#19A1FB", "#5863F7", "#9326FF", "#EC58F7", "#FF4383", "#43FFEC"]);
-
+    
+    countryData.forEach(function(d){
+       d.literacy = parseInt(d["Literacy (%)"], 10) 
+    });
+    
     showRegionSelector(ndx, "#country-selector");
     showPopPercent(ndx, "#pop-percent", colorScale);
     showLandLockedPercent(ndx, "#landlocked-percent", colorScale);
-    showTop5PopCountries(ndx, "#most-pop-countries", colorScale);
+    showTop5PopCountries(ndx, "#most-pop-countries");
+    showTop5RichCountries(ndx, "#most-rich-countries");
+    showCorrelationOne(ndx, "#show-correlation-one");
+    //showCorrelationTwo(ndx, "#show-correlation-two");
 
     dc.renderAll();
 }
@@ -30,7 +37,6 @@ function showRegionSelector(ndx, element) {
 function showPopPercent(ndx, element, colorScale) {
     var countryDim = ndx.dimension(dc.pluck("Country"));
     var population = countryDim.group().reduceSum(dc.pluck("Population"));
-
     dc.pieChart(element)
         .height(330)
         .radius(100)
@@ -81,20 +87,20 @@ function showLandLockedPercent(ndx, element, colorScale) {
         .colors(colorScale);
 }
 
-function showTop5PopCountries(ndx, element, colorScale) {
-    var countryDim = ndx.dimension(dc.pluck("Country"));
-    var popGroup = countryDim.group().reduceSum(function(d) {
-        return d.Population;
-    });
-
-    function getTops(data) {
+function getTops(data) {
         return {
             all: function() {
                 return data.top(5);
             }
         };
     }
-    
+
+function showTop5PopCountries(ndx, element) {
+    var countryDim = ndx.dimension(dc.pluck("Country"));
+    var popGroup = countryDim.group().reduceSum(function(d) {
+        return d.Population;
+    });
+
     var fakeGroup = getTops(popGroup);
     
     dc.barChart(element)
@@ -111,3 +117,77 @@ function showTop5PopCountries(ndx, element, colorScale) {
         .yAxisLabel("Population")
         .yAxis().ticks(4);
 }
+
+function showTop5RichCountries(ndx, element) {
+    var countryDim = ndx.dimension(dc.pluck("Country"));
+    var popGroup = countryDim.group().reduceSum(function(d) {
+        return d.GDP;
+    });
+
+    var fakeGroup = getTops(popGroup);
+    
+    dc.barChart(element)
+        .width(500)
+        .height(500)
+        .margins({ top: 10, right: 50, bottom: 30, left: 50 })
+        .dimension(countryDim)
+        .group(fakeGroup)
+        .transitionDuration(1000)
+        .x(d3.scale.ordinal())
+        .xUnits(dc.units.ordinal)
+        .elasticX(true)
+        .elasticY(true)
+        .yAxisLabel("GDP ($ Per Capita)")
+        .yAxis().ticks(4);
+}
+
+function showCorrelationOne(ndx, element){
+    var gdpDim = ndx.dimension(function(d){
+       return d.GDP; 
+    });
+    var minGDP = gdpDim.bottom(1)[0].GDP;
+    var maxGDP = gdpDim.top(1)[0].GDP;
+    var litDim = ndx.dimension(function(d){
+       return [d.GDP, d.literacy]; 
+    });
+    
+    var litGroup = litDim.group();
+    console.log(litGroup.all());
+
+    dc.scatterPlot(element)
+        .width(800)
+        .height(400)
+        .x(d3.scale.linear().domain([minGDP, maxGDP]))
+        .brushOn(false)
+        .symbolSize(5)
+        .clipPadding(10)
+        .yAxisLabel("Literacy %")
+        .dimension(litDim)
+        .group(litGroup);
+}
+
+/*function showCorrelationTwo(ndx, element){
+    var gdpDim = ndx.dimension(function(d){
+       return d.GDP; 
+    });
+    
+    var minGDP = gdpDim.bottom(1)[0].GDP;
+    var maxGDP = gdpDim.top(1)[0].GDP;
+    console.log(maxGDP);
+    var litDim = ndx.dimension(function(d){
+       return [d.GDP, d.literacy]; 
+    });
+    
+    var litGroup = litDim.group();
+    
+    dc.scatterPlot(element)
+        .width(800)
+        .height(400)
+        .x(d3.scale.linear().domain([minGDP, maxGDP]))
+        .brushOn(false)
+        .symbolSize(5)
+        .clipPadding(10)
+        .yAxisLabel("")
+        .dimension(litDim)
+        .group(litGroup);
+}*/
