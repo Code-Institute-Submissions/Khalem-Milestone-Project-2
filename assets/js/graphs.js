@@ -8,7 +8,7 @@ function makeGraphs(error, countryData) {
     var ndx = crossfilter(countryData);
     //Declaring color scale to be used in all charts
     var colorScale = d3.scale.ordinal().range(["#31FFAB", "#19A1FB", "#5863F7", "#9326FF", "#EC58F7", "#FF4383", "#43FFEC"]);
-
+    //Some data values result in no value, replace to 0 to stop graphing issues
     countryData.forEach(function(d) {
         d.literacy = parseFloat(d["Literacy (%)"]);
         d.populationDensity = parseFloat(d["Pop. Density (per sq. mi.)"], 10);
@@ -93,7 +93,7 @@ function showLandLockedPercent(ndx, element, colorScale) {
         })
         .colors(colorScale);
 }
-
+//Filter top 5 of data
 function getTops(data) {
     return {
         all: function() {
@@ -101,7 +101,7 @@ function getTops(data) {
         }
     };
 }
-
+//First Top 5 Bar Chart - need to add option to choose which piece of data to display
 function showTop5PopCountries(ndx, element) {
     var selectBox = document.getElementById("top5Select");
     var selectedValue = selectBox[selectBox.selectedIndex].value;
@@ -118,6 +118,7 @@ function showTop5PopCountries(ndx, element) {
         .dimension(countryDim)
         .group(fakeGroup)
         .transitionDuration(1000)
+        .ordinalColors(["#31FFAB"])
         .x(d3.scale.ordinal())
         .xUnits(dc.units.ordinal)
         .elasticX(true)
@@ -126,7 +127,7 @@ function showTop5PopCountries(ndx, element) {
         .yAxis().ticks(4);
 
 }
-
+//Second Top 5 Bar Chart - need to add option to choose which piece of data to display
 function showTop5RichCountries(ndx, element) {
     var countryDim = ndx.dimension(dc.pluck("Country"));
     var popGroup = countryDim.group().reduceSum(function(d) {
@@ -144,12 +145,13 @@ function showTop5RichCountries(ndx, element) {
         .transitionDuration(1000)
         .x(d3.scale.ordinal())
         .xUnits(dc.units.ordinal)
+        .ordinalColors(["#31FFAB"])
         .elasticX(true)
         .elasticY(true)
         .yAxisLabel("GDP ($ Per Capita)")
         .yAxis().ticks(4);
 }
-
+//First Scatter Plot - need to add option to choose which 2 pieces of data to display
 function showCorrelationOne(ndx, element) {
     /*var gdpDim = ndx.dimension(function(d) {
         return d.GDP;
@@ -181,10 +183,11 @@ function showCorrelationOne(ndx, element) {
         .symbolSize(5)
         .clipPadding(10)
         .yAxisLabel("Literacy %")
+        .colors("#31FFAB")
         .dimension(litDim)
         .group(litGroup);
 }
-
+//Second Scatter Plot - need to add option to choose which 2 pieces of data to display
 function showCorrelationTwo(ndx, element) {
     var popDens = ndx.dimension(function(d) {
         return d.populationDensity;
@@ -207,6 +210,7 @@ function showCorrelationTwo(ndx, element) {
         .symbolSize(5)
         .clipPadding(10)
         .yAxisLabel("")
+        .colors("#19A1FB")
         .dimension(litDim)
         .group(litGroup);
 }
