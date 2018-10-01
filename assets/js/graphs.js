@@ -2,23 +2,30 @@ queue()
     .defer(d3.csv, "data/country-data.csv")
     .await(makeGraphs);
 
+
 //Call all graph functions
 function makeGraphs(error, countryData) {
     var ndx = crossfilter(countryData);
     //Declaring color scale to be used in all charts
     var colorScale = d3.scale.ordinal().range(["#31FFAB", "#19A1FB", "#5863F7", "#9326FF", "#EC58F7", "#FF4383", "#43FFEC"]);
-    
-    countryData.forEach(function(d){
-       d.literacy = parseInt(d["Literacy (%)"], 10) 
+
+    countryData.forEach(function(d) {
+        d.literacy = parseFloat(d["Literacy (%)"]);
+        d.populationDensity = parseFloat(d["Pop. Density (per sq. mi.)"], 10);
+        d.birthrate = parseFloat(d["Birthrate"], 10);
+        d.deathrate = parseFloat(d["Deathrate"], 10);
+        if (isNaN(d.literacy) == true) {
+            d.literacy = 0;
+        }
     });
-    
-    showRegionSelector(ndx, "#country-selector");
+
+    showRegionSelector(ndx, "#region-selector");
     showPopPercent(ndx, "#pop-percent", colorScale);
     showLandLockedPercent(ndx, "#landlocked-percent", colorScale);
     showTop5PopCountries(ndx, "#most-pop-countries");
     showTop5RichCountries(ndx, "#most-rich-countries");
     showCorrelationOne(ndx, "#show-correlation-one");
-    //showCorrelationTwo(ndx, "#show-correlation-two");
+    showCorrelationTwo(ndx, "#show-correlation-two");
 
     dc.renderAll();
 }
@@ -88,22 +95,23 @@ function showLandLockedPercent(ndx, element, colorScale) {
 }
 
 function getTops(data) {
-        return {
-            all: function() {
-                return data.top(5);
-            }
-        };
-    }
+    return {
+        all: function() {
+            return data.top(5);
+        }
+    };
+}
 
 function showTop5PopCountries(ndx, element) {
+    var selectBox = document.getElementById("top5Select");
+    var selectedValue = selectBox[selectBox.selectedIndex].value;
+    
     var countryDim = ndx.dimension(dc.pluck("Country"));
-    var popGroup = countryDim.group().reduceSum(function(d) {
-        return d.Population;
-    });
+    var popGroup = countryDim.group().reduceSum(dc.pluck(selectedValue));
 
     var fakeGroup = getTops(popGroup);
-    
-    dc.barChart(element)
+
+    var barChartOne = dc.barChart(element)
         .width(500)
         .height(500)
         .margins({ top: 10, right: 50, bottom: 30, left: 50 })
@@ -116,6 +124,7 @@ function showTop5PopCountries(ndx, element) {
         .elasticY(true)
         .yAxisLabel("Population")
         .yAxis().ticks(4);
+
 }
 
 function showTop5RichCountries(ndx, element) {
@@ -125,7 +134,7 @@ function showTop5RichCountries(ndx, element) {
     });
 
     var fakeGroup = getTops(popGroup);
-    
+
     dc.barChart(element)
         .width(500)
         .height(500)
@@ -141,23 +150,33 @@ function showTop5RichCountries(ndx, element) {
         .yAxis().ticks(4);
 }
 
-function showCorrelationOne(ndx, element){
-    var gdpDim = ndx.dimension(function(d){
-       return d.GDP; 
+function showCorrelationOne(ndx, element) {
+    /*var gdpDim = ndx.dimension(function(d) {
+        return d.GDP;
     });
+
     var minGDP = gdpDim.bottom(1)[0].GDP;
     var maxGDP = gdpDim.top(1)[0].GDP;
-    var litDim = ndx.dimension(function(d){
-       return [d.GDP, d.literacy]; 
+    var litDim = ndx.dimension(function(d) {
+        return [d.GDP, d.literacy];
     });
-    
-    var litGroup = litDim.group();
-    console.log(litGroup.all());
+
+
+    var litGroup = litDim.group();*/
+
+    // Code above would not actually provide the max value of the GDP. 
+
+    var litDim = ndx.dimension(function(d) {
+        return [Math.floor(d.GDP), Math.floor(d.literacy)];
+    });
+
+    var litGroup = litDim.group().reduceCount();
 
     dc.scatterPlot(element)
-        .width(800)
+        .width(1000)
         .height(400)
-        .x(d3.scale.linear().domain([minGDP, maxGDP]))
+        .x(d3.scale.linear().domain([0, 56000]))
+        .y(d3.scale.linear().domain([0, 100]))
         .brushOn(false)
         .symbolSize(5)
         .clipPadding(10)
@@ -166,28 +185,28 @@ function showCorrelationOne(ndx, element){
         .group(litGroup);
 }
 
-/*function showCorrelationTwo(ndx, element){
-    var gdpDim = ndx.dimension(function(d){
-       return d.GDP; 
+function showCorrelationTwo(ndx, element) {
+    var popDens = ndx.dimension(function(d) {
+        return d.populationDensity;
     });
-    
-    var minGDP = gdpDim.bottom(1)[0].GDP;
-    var maxGDP = gdpDim.top(1)[0].GDP;
-    console.log(maxGDP);
-    var litDim = ndx.dimension(function(d){
-       return [d.GDP, d.literacy]; 
+
+    var minPopDens = popDens.bottom(1)[0].populationDensity;
+    var maxPopDens = popDens.top(1)[0].populationDensity;
+    console.log(maxPopDens);
+    var litDim = ndx.dimension(function(d) {
+        return [d.populationDensity, (d.birthrate - d.deathrate)];
     });
-    
+
     var litGroup = litDim.group();
-    
+
     dc.scatterPlot(element)
-        .width(800)
+        .width(1000)
         .height(400)
-        .x(d3.scale.linear().domain([minGDP, maxGDP]))
+        .x(d3.scale.linear().domain([minPopDens, maxPopDens]))
         .brushOn(false)
         .symbolSize(5)
         .clipPadding(10)
         .yAxisLabel("")
         .dimension(litDim)
         .group(litGroup);
-}*/
+}
