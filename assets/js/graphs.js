@@ -2,7 +2,6 @@ queue()
     .defer(d3.csv, "data/country-data.csv")
     .await(makeGraphs);
 
-
 //Call all graph functions
 function makeGraphs(error, countryData) {
     var ndx = crossfilter(countryData);
@@ -10,10 +9,28 @@ function makeGraphs(error, countryData) {
     var colorScale = d3.scale.ordinal().range(["#31FFAB", "#19A1FB", "#5863F7", "#9326FF", "#EC58F7", "#FF4383", "#43FFEC"]);
     //Some data values result in no value, replace to 0 to stop graphing issues
     countryData.forEach(function(d) {
+        //Replacing commas for decimals
+        d.Industry = d.Industry.replace(",", ".");
+        d.Birthrate = d.Birthrate.replace(",", ".");
+        d.Deathrate = d.Deathrate.replace(",", ".");
+        d.Service = d.Service.replace(",", ".");
+        d.Agriculture = d.Agriculture.replace(",", ".");
+        d.popDensity = d["Pop. Density (per sq. mi.)"].replace(",", ".");
+        d.netMigration = d["Net migration"].replace(",", ".");
+        d.phones = d["Phones (per 1000)"].replace(",", ".");
+        
+        //Parse to make variable easier to use
         d.literacy = parseFloat(d["Literacy (%)"]);
         d.populationDensity = parseFloat(d["Pop. Density (per sq. mi.)"], 10);
         d.birthrate = parseFloat(d["Birthrate"], 10);
         d.deathrate = parseFloat(d["Deathrate"], 10);
+        d.industry = parseFloat(d["Industry"]);
+        d.service = parseFloat(d["Service"]);
+        d.agriculture = parseFloat(d["Agriculture"]);
+        d.popDensity = parseFloat(d.popDensity);
+        d.netMigration = parseFloat(d.netMigration);
+        d.phones = parseFloat(d.phones);
+        d.area = parseInt(d["Area (sq. mi.)"]);
         if (isNaN(d.literacy) == true) {
             d.literacy = 0;
         }
@@ -26,8 +43,18 @@ function makeGraphs(error, countryData) {
     showTop5RichCountries(ndx, "#most-rich-countries");
     showCorrelationOne(ndx, "#show-correlation-one");
     showCorrelationTwo(ndx, "#show-correlation-two");
-
+    
     dc.renderAll();
+    $("#chartOneSelect").change(function(){
+       showTop5PopCountries(ndx, "#most-pop-countries");
+       dc.renderAll();
+       console.log("TESTEST");
+    });
+    $("#chartTwoSelect").change(function(){
+       showTop5RichCountries(ndx, "#most-rich-countries");
+       dc.renderAll();
+       console.log("TESTEST");
+    });
 }
 
 //Region Selector
@@ -101,13 +128,14 @@ function getTops(data) {
         }
     };
 }
+
 //First Top 5 Bar Chart - need to add option to choose which piece of data to display
 function showTop5PopCountries(ndx, element) {
-    var selectBox = document.getElementById("top5Select");
-    var selectedValue = selectBox[selectBox.selectedIndex].value;
-    
+    var selector = document.getElementById("chartOneSelect");
+    var selectorValue = selector.options[selector.selectedIndex].value;
+    console.log(selectorValue);
     var countryDim = ndx.dimension(dc.pluck("Country"));
-    var popGroup = countryDim.group().reduceSum(dc.pluck(selectedValue));
+    var popGroup = countryDim.group().reduceSum(dc.pluck(selectorValue));
 
     var fakeGroup = getTops(popGroup);
 
@@ -125,14 +153,14 @@ function showTop5PopCountries(ndx, element) {
         .elasticY(true)
         .yAxisLabel("Population")
         .yAxis().ticks(4);
-
 }
 //Second Top 5 Bar Chart - need to add option to choose which piece of data to display
 function showTop5RichCountries(ndx, element) {
+    var selector = document.getElementById("chartTwoSelect");
+    var selectorValue = selector.options[selector.selectedIndex].value;
+    
     var countryDim = ndx.dimension(dc.pluck("Country"));
-    var popGroup = countryDim.group().reduceSum(function(d) {
-        return d.GDP;
-    });
+    var popGroup = countryDim.group().reduceSum(dc.pluck(selectorValue));
 
     var fakeGroup = getTops(popGroup);
 
