@@ -177,57 +177,82 @@ function getTops(data) {
 }
 
 //Create function to display correct y-axis label
-function getYAxisLabel() {
-    var selector = document.getElementById("chartOneSelect");
-    var selectorValue = selector.options[selector.selectedIndex].value;
-
-    var selectorTwo = document.getElementById("chartTwoSelect");
-    var selectorValueTwo = selectorTwo.options[selectorTwo.selectedIndex].value;
-
-    var selectorThree = document.getElementById("scatterOneSecondSelect");
-    var selectorValueThree = selectorThree.options[selectorThree.selectedIndex].value;
-
-    var selectorFour = document.getElementById("scatterOneSecondSelect");
-    var selectorValueFour = selectorFour.options[selectorFour.selectedIndex].value;
-
-    if (selectorValue == "GDP" || selectorValueTwo == "GDP" || selectorValueThree == "GDP" || selectorValueFour == "GDP") {
+function getYAxisLabel(selectorValue) {
+    if (selectorValue == "GDP") {
         return "GDP ($ per capita)";
     }
-    else if (selectorValue == "Population" || selectorValueTwo == "Population" || selectorValueThree == "Population" || selectorValueFour == "Population") {
+    else if (selectorValue == "Population") {
         return "Population";
     }
-    else if (selectorValue == "area" || selectorValueTwo == "area" || selectorValueThree == "area" || selectorValueFour == "area") {
+    else if (selectorValue == "area") {
         return "Area (sq. mi.)";
     }
-    else if (selectorValue == "popDensity" || selectorValueTwo == "popDensity" || selectorValueThree == "popDensity" || selectorValueFour == "popDensity") {
+    else if (selectorValue == "popDensity") {
         return "Pop. Density (per sq. mi.)";
     }
-    else if (selectorValue == "netMigration" || selectorValueTwo == "netMigration" || selectorValueThree == "netMigration" || selectorValueFour == "netMigration") {
+    else if (selectorValue == "netMigration") {
         return "Net migration";
     }
-    else if (selectorValue == "phones" || selectorValueTwo == "phones" || selectorValueThree == "phones" || selectorValueFour == "phones") {
+    else if (selectorValue == "phones") {
         return "Phones (per 1000)"
     }
-    else if (selectorValue == "Birthrate" || selectorValueTwo == "Birthrate" || selectorValueThree == "Birthrate" || selectorValueFour == "Birthrate") {
+    else if (selectorValue == "Birthrate") {
         return "Birthrate";
     }
-    else if (selectorValue == "Deathrate" || selectorValueTwo == "Deathrate" || selectorValueThree == "Deathrate" || selectorValueFour == "Deathrate") {
+    else if (selectorValue == "Deathrate") {
         return "Deathrate";
     }
-    else if (selectorValue == "Agriculture" || selectorValueTwo == "Agriculture" || selectorValueThree == "Agriculture" || selectorValueFour == "Agriculture") {
+    else if (selectorValue == "Agriculture") {
         return "Agriculture";
     }
-    else if (selectorValue == "Industry" || selectorValueTwo == "Industry" || selectorValueThree == "Industry" || selectorValueFour == "Industry") {
+    else if (selectorValue == "Industry") {
         return "Industry";
     }
-    else if (selectorValue == "infantMortality" || selectorValueTwo == "infantMortality" || selectorValueThree == "infantMortality" || selectorValueFour == "infantMortality") {
+    else if (selectorValue == "infantMortality") {
         return "Infanty Mortality Per 1000";
     }
-    else if (selectorValue == "literacy" || selectorValueTwo == "literacy" || selectorValueThree == "literacy" || selectorValueFour == "literacy") {
+    else if (selectorValue == "literacy") {
         return "Literacy";
     }
 }
-
+function getXAxisLabel(selectorValueTwo){
+    if (selectorValueTwo == "GDP") {
+        return "GDP ($ per capita)";
+    }
+    else if (selectorValueTwo == "Population") {
+        return "Population";
+    }
+    else if (selectorValueTwo == "area") {
+        return "Area (sq. mi.)";
+    }
+    else if (selectorValueTwo == "popDensity") {
+        return "Pop. Density (per sq. mi.)";
+    }
+    else if (selectorValueTwo == "netMigration") {
+        return "Net migration";
+    }
+    else if (selectorValueTwo == "phones") {
+        return "Phones (per 1000)"
+    }
+    else if (selectorValueTwo == "Birthrate") {
+        return "Birthrate";
+    }
+    else if (selectorValueTwo == "Deathrate") {
+        return "Deathrate";
+    }
+    else if (selectorValueTwo == "Agriculture") {
+        return "Agriculture";
+    }
+    else if (selectorValueTwo == "Industry") {
+        return "Industry";
+    }
+    else if (selectorValueTwo == "infantMortality") {
+        return "Infanty Mortality Per 1000";
+    }
+    else if (selectorValueTwo == "literacy") {
+        return "Literacy";
+    }
+}
 //First Top 5 Bar Chart
 function showTop5PopCountries(ndx, element) {
     var selector = document.getElementById("chartOneSelect");
@@ -250,7 +275,7 @@ function showTop5PopCountries(ndx, element) {
         .xUnits(dc.units.ordinal)
         .elasticX(true)
         .elasticY(true)
-        .yAxisLabel(getYAxisLabel())
+        .yAxisLabel(getYAxisLabel(selectorValue))
         .yAxis().ticks(4);
 }
 
@@ -276,14 +301,14 @@ function showTop5RichCountries(ndx, element) {
         .ordinalColors(["#31FFAB"])
         .elasticX(true)
         .elasticY(true)
-        .yAxisLabel(getYAxisLabel())
+        .yAxisLabel(getYAxisLabel(selectorValue))
         .yAxis().ticks(4);
 }
 
-//First Scatter Plot - need to add option to choose which 2 pieces of data to display
+//First Scatter Plot
 function showCorrelationOne(ndx, element) {
     var selectorOne = document.getElementById("scatterOneFirstSelect");
-    var selectorValueOne = selectorOne.options[selectorOne.selectedIndex].value;
+    var selectorValue = selectorOne.options[selectorOne.selectedIndex].value;
 
     var selectorTwo = document.getElementById("scatterOneSecondSelect");
     var selectorValueTwo = selectorTwo.options[selectorTwo.selectedIndex].value;
@@ -293,9 +318,9 @@ function showCorrelationOne(ndx, element) {
     var valueArrayOne = [];
     var valueArrayTwo = [];
     var litDim = ndx.dimension(function(d) {
-        valueArrayOne.push(Math.floor(d[selectorValueOne]));
+        valueArrayOne.push(Math.floor(d[selectorValue]));
         valueArrayTwo.push(Math.floor(d[selectorValueTwo]));
-        return [Math.floor(d[selectorValueOne]), Math.floor(d[selectorValueTwo])];
+        return [Math.floor(d[selectorValue]), Math.floor(d[selectorValueTwo])];
     });
     valueArrayOne = valueArrayOne.filter(Boolean);
     valueArrayTwo = valueArrayTwo.filter(Boolean);
@@ -314,31 +339,33 @@ function showCorrelationOne(ndx, element) {
         .brushOn(false)
         .symbolSize(5)
         .clipPadding(10)
-        .yAxisLabel(getYAxisLabel())
+        .xAxisLabel(getXAxisLabel(selectorValueTwo))
+        .yAxisLabel(getYAxisLabel(selectorValue))
         .colors("#31FFAB")
         .dimension(litDim)
         .group(litGroup);
 }
-//Second Scatter Plot - need to add option to choose which 2 pieces of data to display
+//Second Scatter Plot
 function showCorrelationTwo(ndx, element) {
     var selectorOne = document.getElementById("scatterTwoFirstSelect");
-    var selectorValueOne = selectorOne.options[selectorOne.selectedIndex].value;
+    var selectorValue = selectorOne.options[selectorOne.selectedIndex].value;
 
     var selectorTwo = document.getElementById("scatterTwoSecondSelect");
     var selectorValueTwo = selectorTwo.options[selectorTwo.selectedIndex].value;
-    console.log(selectorValueOne);
+    console.log(selectorValue);
     //Create array with all values, then get min and max values.
     var valueArrayOne = [];
     var valueArrayTwo = [];
     var litDim = ndx.dimension(function(d) {
-        valueArrayOne.push(Math.floor(d[selectorValueOne] * 100) / 100);  //Get values to 2 decimal places
+        valueArrayOne.push(Math.floor(d[selectorValue] * 100) / 100);  //Get values to 2 decimal places
         valueArrayTwo.push(Math.floor(d[selectorValueTwo] * 100) / 100); //Get values to 2 decimal places
-        return [Math.floor(d[selectorValueOne] * 100)/ 100, Math.floor(d[selectorValueTwo] * 100)/ 100];
+        return [Math.floor(d[selectorValue] * 100)/ 100, Math.floor(d[selectorValueTwo] * 100)/ 100]; // Do the same so when in group will produce correct values.
     });
-    console.log(valueArrayOne);
+    //Filtering out countries with no value
     valueArrayOne = valueArrayOne.filter(Boolean);
     valueArrayTwo = valueArrayTwo.filter(Boolean);
     console.log(valueArrayOne);
+    //Get min and max values
     var minValueOne = Math.min(...valueArrayOne);
     var maxValueOne = Math.max(...valueArrayOne);
     var minValueTwo = Math.min(...valueArrayTwo);
@@ -346,9 +373,7 @@ function showCorrelationTwo(ndx, element) {
 
 
     var litGroup = litDim.group().reduceCount();
-    
-    console.log(litGroup.all());
-
+    //Draw chart
     dc.scatterPlot(element)
         .width(1000)
         .height(400)
@@ -357,7 +382,8 @@ function showCorrelationTwo(ndx, element) {
         .brushOn(false)
         .symbolSize(5)
         .clipPadding(10)
-        .yAxisLabel(getYAxisLabel())
+        .xAxisLabel(getXAxisLabel(selectorValueTwo))
+        .yAxisLabel(getYAxisLabel(selectorValue))
         .colors("#31FFAB")
         .dimension(litDim)
         .group(litGroup);
