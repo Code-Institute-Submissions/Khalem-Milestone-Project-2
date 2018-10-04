@@ -18,7 +18,7 @@ function makeGraphs(error, countryData) {
         d.popDensity = d["Pop. Density (per sq. mi.)"].replace(",", ".");
         d.netMigration = d["Net migration"].replace(",", ".");
         d.phones = d["Phones (per 1000)"].replace(",", ".");
-        
+
         //Parse to make variable easier to use
         d.literacy = parseFloat(d["Literacy (%)"]);
         d.populationDensity = parseFloat(d["Pop. Density (per sq. mi.)"], 10);
@@ -43,17 +43,25 @@ function makeGraphs(error, countryData) {
     showTop5RichCountries(ndx, "#most-rich-countries");
     showCorrelationOne(ndx, "#show-correlation-one");
     showCorrelationTwo(ndx, "#show-correlation-two");
-    
+
     dc.renderAll();
-    $("#chartOneSelect").change(function(){
-       showTop5PopCountries(ndx, "#most-pop-countries");
-       dc.renderAll();
-       console.log("TESTEST");
+    $("#chartOneSelect").change(function() {
+        showTop5PopCountries(ndx, "#most-pop-countries");
+        dc.renderAll();
+        console.log("TESTEST");
     });
-    $("#chartTwoSelect").change(function(){
-       showTop5RichCountries(ndx, "#most-rich-countries");
-       dc.renderAll();
-       console.log("TESTEST");
+    $("#chartTwoSelect").change(function() {
+        showTop5RichCountries(ndx, "#most-rich-countries");
+        dc.renderAll();
+        console.log("TESTEST");
+    });
+    $("#scatterOne").click(function() {
+        showCorrelationOne(ndx, "#show-correlation-one");
+        dc.renderAll();
+    });
+    $("#scatterTwo").click(function() {
+        showCorrelationTwo(ndx, "#show-correlation-two");
+        dc.renderAll();
     });
 }
 
@@ -81,42 +89,81 @@ function showPopPercent(ndx, element, colorScale) {
 }
 //Land Locked Percentages - Pie Chart
 function showLandLockedPercent(ndx, element, colorScale) {
-    var countryDim = ndx.dimension(dc.pluck("Coastline"));
-    //Creating custome reduce to display which countries are landlocked
-    var landlocked = countryDim.group().reduce(
-        function(p, v) {
-            if (v.Coastline == "0,00") {
-                p.landlocked++;
-                return p;
+    /*    var countryDim = ndx.dimension(dc.pluck("Coastline"));
+        //Creating custome reduce to display which countries are landlocked
+        var landlocked = countryDim.group().reduce(
+            function(p, v) {
+                if (v.Coastline == "0,00") {
+                    p.landlocked++;
+                    return p;
+                }
+                else {
+                    p.coast++;
+                    return p;
+                }
+            },
+            function(p, v) {
+                if (v.Coastline == "0,00") {
+                    p.landlocked--;
+                    return p;
+                }
+                else {
+                    p.coast--;
+                    return p;
+                }
+            },
+            function() {
+                return { landlocked: 0, coast: 0 };
             }
-            else {
-                p.coast++;
+        );*/
+    var countryDim = ndx.dimension(dc.pluck("Climate"));
+    var climate = countryDim.group().reduce(
+        function(p, v) {
+            p.count++;
+            if(v.Climate == 1 || v.Climate == 1,5){
+                p.climateOne++;
+                return p;
+            } else if(v.Climate == 2 || v.Climate == 2,5){
+                p.climateTwo++;
+                return p;
+            } else if(v.Climate == 3 || v.Climate == 3,5){
+                p.climateThree++;
+                return p;
+            } else if(v.Climate == 4 || v.Climate == 4,5){
+                p.climateFour++;
                 return p;
             }
         },
         function(p, v) {
-            if (v.Coastline == "0,00") {
-                p.landlocked--;
+            p.count--;
+            if(v.Climate == 1 || v.Climate == 1,5){
+                p.climateOne--;
                 return p;
-            }
-            else {
-                p.coast--;
+            } else if(v.Climate == 2 || v.Climate == 2,5){
+                p.climateTwo--;
+                return p;
+            } else if(v.Climate == 3 || v.Climate == 3,5){
+                p.climateThree--;
+                return p;
+            } else if(v.Climate == 4 || v.Climate == 4,5){
+                p.climateFour--;
                 return p;
             }
         },
         function() {
-            return { landlocked: 0, coast: 0 };
+            return { climateOne: 0, climateTwo: 0, climateThree: 0, climateFour: 0, count: 0};
         }
-    );
 
+
+    );
     dc.pieChart(element)
         .height(330)
         .radius(100)
         .transitionDuration(1000)
         .dimension(countryDim)
-        .group(landlocked)
-        .valueAccessor(function(d) {
-            return d.value.landlocked + d.value.coast;
+        .group(climate)
+        .valueAccessor(function(d){
+            return d.value.climateOne;
         })
         .colors(colorScale);
 }
@@ -129,7 +176,59 @@ function getTops(data) {
     };
 }
 
-//First Top 5 Bar Chart - need to add option to choose which piece of data to display
+//Create function to display correct y-axis label
+function getYAxisLabel() {
+    var selector = document.getElementById("chartOneSelect");
+    var selectorValue = selector.options[selector.selectedIndex].value;
+
+    var selectorTwo = document.getElementById("chartTwoSelect");
+    var selectorValueTwo = selectorTwo.options[selectorTwo.selectedIndex].value;
+
+    var selectorThree = document.getElementById("scatterOneSecondSelect");
+    var selectorValueThree = selectorThree.options[selectorThree.selectedIndex].value;
+
+    var selectorFour = document.getElementById("scatterOneSecondSelect");
+    var selectorValueFour = selectorFour.options[selectorFour.selectedIndex].value;
+
+    if (selectorValue == "GDP" || selectorValueTwo == "GDP" || selectorValueThree == "GDP" || selectorValueFour == "GDP") {
+        return "GDP ($ per capita)";
+    }
+    else if (selectorValue == "Population" || selectorValueTwo == "Population" || selectorValueThree == "Population" || selectorValueFour == "Population") {
+        return "Population";
+    }
+    else if (selectorValue == "area" || selectorValueTwo == "area" || selectorValueThree == "area" || selectorValueFour == "area") {
+        return "Area (sq. mi.)";
+    }
+    else if (selectorValue == "popDensity" || selectorValueTwo == "popDensity" || selectorValueThree == "popDensity" || selectorValueFour == "popDensity") {
+        return "Pop. Density (per sq. mi.)";
+    }
+    else if (selectorValue == "netMigration" || selectorValueTwo == "netMigration" || selectorValueThree == "netMigration" || selectorValueFour == "netMigration") {
+        return "Net migration";
+    }
+    else if (selectorValue == "phones" || selectorValueTwo == "phones" || selectorValueThree == "phones" || selectorValueFour == "phones") {
+        return "Phones (per 1000)"
+    }
+    else if (selectorValue == "Birthrate" || selectorValueTwo == "Birthrate" || selectorValueThree == "Birthrate" || selectorValueFour == "Birthrate") {
+        return "Birthrate";
+    }
+    else if (selectorValue == "Deathrate" || selectorValueTwo == "Deathrate" || selectorValueThree == "Deathrate" || selectorValueFour == "Deathrate") {
+        return "Deathrate";
+    }
+    else if (selectorValue == "Agriculture" || selectorValueTwo == "Agriculture" || selectorValueThree == "Agriculture" || selectorValueFour == "Agriculture") {
+        return "Agriculture";
+    }
+    else if (selectorValue == "Industry" || selectorValueTwo == "Industry" || selectorValueThree == "Industry" || selectorValueFour == "Industry") {
+        return "Industry";
+    }
+    else if (selectorValue == "infantMortality" || selectorValueTwo == "infantMortality" || selectorValueThree == "infantMortality" || selectorValueFour == "infantMortality") {
+        return "Infanty Mortality Per 1000";
+    }
+    else if (selectorValue == "literacy" || selectorValueTwo == "literacy" || selectorValueThree == "literacy" || selectorValueFour == "literacy") {
+        return "Literacy";
+    }
+}
+
+//First Top 5 Bar Chart
 function showTop5PopCountries(ndx, element) {
     var selector = document.getElementById("chartOneSelect");
     var selectorValue = selector.options[selector.selectedIndex].value;
@@ -151,14 +250,15 @@ function showTop5PopCountries(ndx, element) {
         .xUnits(dc.units.ordinal)
         .elasticX(true)
         .elasticY(true)
-        .yAxisLabel("Population")
+        .yAxisLabel(getYAxisLabel())
         .yAxis().ticks(4);
 }
+
 //Second Top 5 Bar Chart - need to add option to choose which piece of data to display
 function showTop5RichCountries(ndx, element) {
     var selector = document.getElementById("chartTwoSelect");
     var selectorValue = selector.options[selector.selectedIndex].value;
-    
+
     var countryDim = ndx.dimension(dc.pluck("Country"));
     var popGroup = countryDim.group().reduceSum(dc.pluck(selectorValue));
 
@@ -176,69 +276,89 @@ function showTop5RichCountries(ndx, element) {
         .ordinalColors(["#31FFAB"])
         .elasticX(true)
         .elasticY(true)
-        .yAxisLabel("GDP ($ Per Capita)")
+        .yAxisLabel(getYAxisLabel())
         .yAxis().ticks(4);
 }
+
 //First Scatter Plot - need to add option to choose which 2 pieces of data to display
 function showCorrelationOne(ndx, element) {
-    /*var gdpDim = ndx.dimension(function(d) {
-        return d.GDP;
-    });
+    var selectorOne = document.getElementById("scatterOneFirstSelect");
+    var selectorValueOne = selectorOne.options[selectorOne.selectedIndex].value;
 
-    var minGDP = gdpDim.bottom(1)[0].GDP;
-    var maxGDP = gdpDim.top(1)[0].GDP;
+    var selectorTwo = document.getElementById("scatterOneSecondSelect");
+    var selectorValueTwo = selectorTwo.options[selectorTwo.selectedIndex].value;
+
+    console.log(typeof selectorValueOne);
+    //Create array with all values, then get min and max values.
+    var valueArrayOne = [];
+    var valueArrayTwo = [];
     var litDim = ndx.dimension(function(d) {
-        return [d.GDP, d.literacy];
+        valueArrayOne.push(Math.floor(d[selectorValueOne]));
+        valueArrayTwo.push(Math.floor(d[selectorValueTwo]));
+        return [Math.floor(d[selectorValueOne]), Math.floor(d[selectorValueTwo])];
     });
-
-
-    var litGroup = litDim.group();*/
-
-    // Code above would not actually provide the max value of the GDP. 
-
-    var litDim = ndx.dimension(function(d) {
-        return [Math.floor(d.GDP), Math.floor(d.literacy)];
-    });
+    valueArrayOne = valueArrayOne.filter(Boolean);
+    valueArrayTwo = valueArrayTwo.filter(Boolean);
+    var minValueOne = Math.min(...valueArrayOne);
+    var maxValueOne = Math.max(...valueArrayOne);
+    var minValueTwo = Math.min(...valueArrayTwo);
+    var maxValueTwo = Math.max(...valueArrayTwo);
 
     var litGroup = litDim.group().reduceCount();
 
     dc.scatterPlot(element)
         .width(1000)
         .height(400)
-        .x(d3.scale.linear().domain([0, 56000]))
-        .y(d3.scale.linear().domain([0, 100]))
+        .x(d3.scale.linear().domain([minValueOne, maxValueOne]))
+        .y(d3.scale.linear().domain([minValueTwo, maxValueTwo]))
         .brushOn(false)
         .symbolSize(5)
         .clipPadding(10)
-        .yAxisLabel("Literacy %")
+        .yAxisLabel(getYAxisLabel())
         .colors("#31FFAB")
         .dimension(litDim)
         .group(litGroup);
 }
 //Second Scatter Plot - need to add option to choose which 2 pieces of data to display
 function showCorrelationTwo(ndx, element) {
-    var popDens = ndx.dimension(function(d) {
-        return d.populationDensity;
-    });
+    var selectorOne = document.getElementById("scatterTwoFirstSelect");
+    var selectorValueOne = selectorOne.options[selectorOne.selectedIndex].value;
 
-    var minPopDens = popDens.bottom(1)[0].populationDensity;
-    var maxPopDens = popDens.top(1)[0].populationDensity;
-    console.log(maxPopDens);
+    var selectorTwo = document.getElementById("scatterTwoSecondSelect");
+    var selectorValueTwo = selectorTwo.options[selectorTwo.selectedIndex].value;
+    console.log(selectorValueOne);
+    //Create array with all values, then get min and max values.
+    var valueArrayOne = [];
+    var valueArrayTwo = [];
     var litDim = ndx.dimension(function(d) {
-        return [d.populationDensity, (d.birthrate - d.deathrate)];
+        valueArrayOne.push(Math.floor(d[selectorValueOne] * 100) / 100);  //Get values to 2 decimal places
+        valueArrayTwo.push(Math.floor(d[selectorValueTwo] * 100) / 100); //Get values to 2 decimal places
+        return [Math.floor(d[selectorValueOne] * 100)/ 100, Math.floor(d[selectorValueTwo] * 100)/ 100];
     });
+    console.log(valueArrayOne);
+    valueArrayOne = valueArrayOne.filter(Boolean);
+    valueArrayTwo = valueArrayTwo.filter(Boolean);
+    console.log(valueArrayOne);
+    var minValueOne = Math.min(...valueArrayOne);
+    var maxValueOne = Math.max(...valueArrayOne);
+    var minValueTwo = Math.min(...valueArrayTwo);
+    var maxValueTwo = Math.max(...valueArrayTwo);
 
-    var litGroup = litDim.group();
+
+    var litGroup = litDim.group().reduceCount();
+    
+    console.log(litGroup.all());
 
     dc.scatterPlot(element)
         .width(1000)
         .height(400)
-        .x(d3.scale.linear().domain([minPopDens, maxPopDens]))
+        .x(d3.scale.linear().domain([minValueOne, maxValueOne]))
+        .y(d3.scale.linear().domain([minValueTwo, maxValueTwo]))
         .brushOn(false)
         .symbolSize(5)
         .clipPadding(10)
-        .yAxisLabel("")
-        .colors("#19A1FB")
+        .yAxisLabel(getYAxisLabel())
+        .colors("#31FFAB")
         .dimension(litDim)
         .group(litGroup);
 }
