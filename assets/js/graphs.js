@@ -22,57 +22,99 @@ function makeGraphs(error, countryData) {
         //Parse to make variable easier to use
         d.literacy = parseFloat(d["Literacy (%)"]);
         d.populationDensity = parseFloat(d["Pop. Density (per sq. mi.)"], 10);
-        d.birthrate = parseFloat(d["Birthrate"], 10);
-        d.deathrate = parseFloat(d["Deathrate"], 10);
-        d.industry = parseFloat(d["Industry"]);
-        d.service = parseFloat(d["Service"]);
-        d.agriculture = parseFloat(d["Agriculture"]);
+        d.birthrate = parseFloat(d.Birthrate, 10);
+        d.deathrate = parseFloat(d.Deathrate, 10);
+        d.industry = parseFloat(d.Industry);
+        d.service = parseFloat(d.Service);
+        d.agriculture = parseFloat(d.Agriculture);
         d.popDensity = parseFloat(d.popDensity);
         d.netMigration = parseFloat(d.netMigration);
         d.phones = parseFloat(d.phones);
         d.area = parseInt(d["Area (sq. mi.)"]);
-        if (isNaN(d.literacy) == true) {
+        //If there is no value for literacy, change it to 0.
+        if (!d.literacy) {
             d.literacy = 0;
         }
+        //If there is no value for Climate, or if value was invalid - change to 5.
+        if(isNaN(d.Climate) == true){
+            d.Climate = 5;
+        } else if(!d.Climate){
+            d.Climate = 5;
+        }
     });
+    //Get height and width of window
+    var width = $(window).width();
+    var height = $(window).height();
+    console.log(height);
+    console.log(width);
 
-    showRegionSelector(ndx, "#region-selector");
+    showLandingGraph(ndx, "#landing-graph", width, height);
     showPopPercent(ndx, "#pop-percent", colorScale);
     showLandLockedPercent(ndx, "#landlocked-percent", colorScale);
-    showTop5PopCountries(ndx, "#most-pop-countries");
-    showTop5RichCountries(ndx, "#most-rich-countries");
-    showCorrelationOne(ndx, "#show-correlation-one");
-    showCorrelationTwo(ndx, "#show-correlation-two");
+    showTop5PopCountries(ndx, "#most-pop-countries", width, height);
+    showTop5RichCountries(ndx, "#most-rich-countries", width, height);
+    showCorrelationOne(ndx, "#show-correlation-one", width, height);
+    showCorrelationTwo(ndx, "#show-correlation-two", width, height);
 
     dc.renderAll();
+    //Each time a select is changed, graphs will re-render displaying new info
+    $("#landingSelect").change(function() {
+        showLandingGraph(ndx, "#landing-graph", width, height);
+        dc.renderAll();
+        console.log("TESTEST");
+    });
     $("#chartOneSelect").change(function() {
-        showTop5PopCountries(ndx, "#most-pop-countries");
+        showTop5PopCountries(ndx, "#most-pop-countries", width, height);
         dc.renderAll();
         console.log("TESTEST");
     });
     $("#chartTwoSelect").change(function() {
-        showTop5RichCountries(ndx, "#most-rich-countries");
+        showTop5RichCountries(ndx, "#most-rich-countries", width, height);
         dc.renderAll();
         console.log("TESTEST");
     });
     $("#scatterOne").click(function() {
-        showCorrelationOne(ndx, "#show-correlation-one");
+        showCorrelationOne(ndx, "#show-correlation-one", width, height);
         dc.renderAll();
     });
     $("#scatterTwo").click(function() {
-        showCorrelationTwo(ndx, "#show-correlation-two");
+        showCorrelationTwo(ndx, "#show-correlation-two", width, height);
         dc.renderAll();
     });
 }
+//Creating landing graph that will act as a region selector also.
+function showLandingGraph(ndx, element, width, height) {
+    var selector = document.getElementById("landingSelect");
+    var selectorValue = selector.options[selector.selectedIndex].value;
 
-//Region Selector
-function showRegionSelector(ndx, element) {
-    dim = ndx.dimension(dc.pluck("Region"));
-    group = dim.group();
-
-    dc.selectMenu(element)
-        .dimension(dim)
-        .group(group);
+    var regionDim = ndx.dimension(dc.pluck("Region"));
+    var landingSelection = regionDim.group().reduceSum(dc.pluck(selectorValue));
+    //Making chart responsive for table/mobile users
+    var newWidth;
+    var newHeight;
+    //If height is larger than width it must scale differently
+    if(height > width){
+        newHeight = height / 2.3;
+        newWidth = width / 1.05;
+    } else {
+        //Keeping same size for laptop and desktop
+        newWidth = 800;
+        newHeight = 500;
+    }
+    dc.barChart(element)
+        .width(newWidth)
+        .height(newHeight)
+        .margins({ top: 10, right: 50, bottom: 100, left: 80 })
+        .dimension(regionDim)
+        .group(landingSelection)
+        .transitionDuration(1000)
+        .ordinalColors(["#31FFAB"])
+        .x(d3.scale.ordinal())
+        .xUnits(dc.units.ordinal)
+        .elasticX(true)
+        .elasticY(true)
+        .yAxisLabel(getYAxisLabel(selectorValue))
+        .yAxis().ticks(4);
 }
 
 //Show Pop Percent - Pie Chart
@@ -89,69 +131,49 @@ function showPopPercent(ndx, element, colorScale) {
 }
 //Land Locked Percentages - Pie Chart
 function showLandLockedPercent(ndx, element, colorScale) {
-    /*    var countryDim = ndx.dimension(dc.pluck("Coastline"));
-        //Creating custome reduce to display which countries are landlocked
-        var landlocked = countryDim.group().reduce(
-            function(p, v) {
-                if (v.Coastline == "0,00") {
-                    p.landlocked++;
-                    return p;
-                }
-                else {
-                    p.coast++;
-                    return p;
-                }
-            },
-            function(p, v) {
-                if (v.Coastline == "0,00") {
-                    p.landlocked--;
-                    return p;
-                }
-                else {
-                    p.coast--;
-                    return p;
-                }
-            },
-            function() {
-                return { landlocked: 0, coast: 0 };
-            }
-        );*/
+    //Creating custom reduce to display climates.
     var countryDim = ndx.dimension(dc.pluck("Climate"));
     var climate = countryDim.group().reduce(
         function(p, v) {
             p.count++;
-            if(v.Climate == 1 || v.Climate == 1,5){
+            if (v.Climate == 1 || v.Climate == 1, 5) {
                 p.climateOne++;
                 return p;
-            } else if(v.Climate == 2 || v.Climate == 2,5){
+            }
+            else if (v.Climate == 2 || v.Climate == 2, 5) {
                 p.climateTwo++;
                 return p;
-            } else if(v.Climate == 3 || v.Climate == 3,5){
+            }
+            else if (v.Climate == 3 || v.Climate == 3, 5) {
                 p.climateThree++;
                 return p;
-            } else if(v.Climate == 4 || v.Climate == 4,5){
+            }
+            else if (v.Climate == 4 || v.Climate == 4, 5) {
                 p.climateFour++;
                 return p;
             }
         },
         function(p, v) {
             p.count--;
-            if(v.Climate == 1 || v.Climate == 1,5){
+            if (v.Climate == 1 || v.Climate == 1, 5) {
                 p.climateOne--;
                 return p;
-            } else if(v.Climate == 2 || v.Climate == 2,5){
+            }
+            else if (v.Climate == 2 || v.Climate == 2, 5) {
                 p.climateTwo--;
                 return p;
-            } else if(v.Climate == 3 || v.Climate == 3,5){
+            }
+            else if (v.Climate == 3 || v.Climate == 3, 5) {
                 p.climateThree--;
                 return p;
-            } else if(v.Climate == 4 || v.Climate == 4,5){
+            }
+            else if (v.Climate == 4 || v.Climate == 4, 5) {
                 p.climateFour--;
                 return p;
             }
         },
         function() {
-            return { climateOne: 0, climateTwo: 0, climateThree: 0, climateFour: 0, count: 0};
+            return { climateOne: 0, climateTwo: 0, climateThree: 0, climateFour: 0, count: 0 };
         }
 
 
@@ -162,7 +184,7 @@ function showLandLockedPercent(ndx, element, colorScale) {
         .transitionDuration(1000)
         .dimension(countryDim)
         .group(climate)
-        .valueAccessor(function(d){
+        .valueAccessor(function(d) {
             return d.value.climateOne;
         })
         .colors(colorScale);
@@ -176,7 +198,7 @@ function getTops(data) {
     };
 }
 
-//Create function to display correct y-axis label
+//Get dynamic Y-Axis labels
 function getYAxisLabel(selectorValue) {
     if (selectorValue == "GDP") {
         return "GDP ($ per capita)";
@@ -215,7 +237,8 @@ function getYAxisLabel(selectorValue) {
         return "Literacy";
     }
 }
-function getXAxisLabel(selectorValueTwo){
+//Get dynamic X-Axis labels
+function getXAxisLabel(selectorValueTwo) {
     if (selectorValueTwo == "GDP") {
         return "GDP ($ per capita)";
     }
@@ -254,19 +277,28 @@ function getXAxisLabel(selectorValueTwo){
     }
 }
 //First Top 5 Bar Chart
-function showTop5PopCountries(ndx, element) {
+function showTop5PopCountries(ndx, element, width, height) {
     var selector = document.getElementById("chartOneSelect");
     var selectorValue = selector.options[selector.selectedIndex].value;
-    console.log(selectorValue);
     var countryDim = ndx.dimension(dc.pluck("Country"));
     var popGroup = countryDim.group().reduceSum(dc.pluck(selectorValue));
-
     var fakeGroup = getTops(popGroup);
+    //Getting charts to scale
+    var newWidth;
+    var newHeight;
+    //If height is larger than width it must scale differently
+    if(height > width){
+        newHeight = height / 3;
+        newWidth = width / 1.2;
+    } else {
+        newWidth = width / 3.84;
+        newHeight = height / 1.938;
+    }
 
     var barChartOne = dc.barChart(element)
-        .width(500)
-        .height(500)
-        .margins({ top: 10, right: 50, bottom: 30, left: 50 })
+        .width(newWidth)
+        .height(newHeight)
+        .margins({ top: 10, right: 50, bottom: 80, left: 80 })
         .dimension(countryDim)
         .group(fakeGroup)
         .transitionDuration(1000)
@@ -280,7 +312,7 @@ function showTop5PopCountries(ndx, element) {
 }
 
 //Second Top 5 Bar Chart - need to add option to choose which piece of data to display
-function showTop5RichCountries(ndx, element) {
+function showTop5RichCountries(ndx, element, width, height) {
     var selector = document.getElementById("chartTwoSelect");
     var selectorValue = selector.options[selector.selectedIndex].value;
 
@@ -288,11 +320,22 @@ function showTop5RichCountries(ndx, element) {
     var popGroup = countryDim.group().reduceSum(dc.pluck(selectorValue));
 
     var fakeGroup = getTops(popGroup);
-
+    //Getting charts to scale
+    var newWidth;
+    var newHeight;
+    //If height is larger than width it must scale differently
+    if(height > width){
+        newHeight = height / 3;
+        newWidth = width / 1.2;
+    } else {
+        newWidth = width / 3.84;
+        newHeight = height / 1.938;
+    }
+    
     dc.barChart(element)
-        .width(500)
-        .height(500)
-        .margins({ top: 10, right: 50, bottom: 30, left: 50 })
+        .width(newWidth)
+        .height(newHeight)
+        .margins({ top: 10, right: 50, bottom: 80, left: 80 })
         .dimension(countryDim)
         .group(fakeGroup)
         .transitionDuration(1000)
@@ -306,7 +349,7 @@ function showTop5RichCountries(ndx, element) {
 }
 
 //First Scatter Plot
-function showCorrelationOne(ndx, element) {
+function showCorrelationOne(ndx, element, width, height) {
     var selectorOne = document.getElementById("scatterOneFirstSelect");
     var selectorValue = selectorOne.options[selectorOne.selectedIndex].value;
 
@@ -318,9 +361,9 @@ function showCorrelationOne(ndx, element) {
     var valueArrayOne = [];
     var valueArrayTwo = [];
     var litDim = ndx.dimension(function(d) {
-        valueArrayOne.push(Math.floor(d[selectorValue]));
-        valueArrayTwo.push(Math.floor(d[selectorValueTwo]));
-        return [Math.floor(d[selectorValue]), Math.floor(d[selectorValueTwo])];
+        valueArrayOne.push(Math.floor(d[selectorValue] * 100) / 100); //Get values to 2 decimal places
+        valueArrayTwo.push(Math.floor(d[selectorValueTwo] * 100) / 100); //Get values to 2 decimal places
+        return [Math.floor(d[selectorValue] * 100) / 100, Math.floor(d[selectorValueTwo] * 100) / 100]; // Do the same so when in group will produce correct values.
     });
     valueArrayOne = valueArrayOne.filter(Boolean);
     valueArrayTwo = valueArrayTwo.filter(Boolean);
@@ -330,23 +373,36 @@ function showCorrelationOne(ndx, element) {
     var maxValueTwo = Math.max(...valueArrayTwo);
 
     var litGroup = litDim.group().reduceCount();
-
+    
+    
+    var newWidth;
+    var newHeight;
+    
+    if(height > width){
+        newWidth = width / 1.15;
+        newHeight = height / 3.5;
+    } else {
+        newWidth = width / 1.27;
+        newHeight = height / 2;
+    }
+    
     dc.scatterPlot(element)
-        .width(1000)
-        .height(400)
+        .width(newWidth)
+        .height(newHeight)
+        .margins({ top: 10, right: 50, bottom: 30, left: 80 })
         .x(d3.scale.linear().domain([minValueOne, maxValueOne]))
         .y(d3.scale.linear().domain([minValueTwo, maxValueTwo]))
         .brushOn(false)
-        .symbolSize(5)
+        .symbolSize(7)
         .clipPadding(10)
-        .xAxisLabel(getXAxisLabel(selectorValueTwo))
-        .yAxisLabel(getYAxisLabel(selectorValue))
+        .xAxisLabel(getXAxisLabel(selectorValue))
+        .yAxisLabel(getYAxisLabel(selectorValueTwo))
         .colors("#31FFAB")
         .dimension(litDim)
         .group(litGroup);
 }
 //Second Scatter Plot
-function showCorrelationTwo(ndx, element) {
+function showCorrelationTwo(ndx, element, width, height) {
     var selectorOne = document.getElementById("scatterTwoFirstSelect");
     var selectorValue = selectorOne.options[selectorOne.selectedIndex].value;
 
@@ -357,9 +413,9 @@ function showCorrelationTwo(ndx, element) {
     var valueArrayOne = [];
     var valueArrayTwo = [];
     var litDim = ndx.dimension(function(d) {
-        valueArrayOne.push(Math.floor(d[selectorValue] * 100) / 100);  //Get values to 2 decimal places
+        valueArrayOne.push(Math.floor(d[selectorValue] * 100) / 100); //Get values to 2 decimal places
         valueArrayTwo.push(Math.floor(d[selectorValueTwo] * 100) / 100); //Get values to 2 decimal places
-        return [Math.floor(d[selectorValue] * 100)/ 100, Math.floor(d[selectorValueTwo] * 100)/ 100]; // Do the same so when in group will produce correct values.
+        return [Math.floor(d[selectorValue] * 100) / 100, Math.floor(d[selectorValueTwo] * 100) / 100]; // Do the same so when in group will produce correct values.
     });
     //Filtering out countries with no value
     valueArrayOne = valueArrayOne.filter(Boolean);
@@ -370,21 +426,32 @@ function showCorrelationTwo(ndx, element) {
     var maxValueOne = Math.max(...valueArrayOne);
     var minValueTwo = Math.min(...valueArrayTwo);
     var maxValueTwo = Math.max(...valueArrayTwo);
-
+    
+    var newWidth;
+    var newHeight;
+    
+    if(height > width){
+        newWidth = width / 1.15;
+        newHeight = height / 3.5;
+    } else {
+        newWidth = width / 1.27;
+        newHeight = height / 2;
+    }
 
     var litGroup = litDim.group().reduceCount();
     //Draw chart
     dc.scatterPlot(element)
-        .width(1000)
-        .height(400)
+        .width(newWidth)
+        .height(newHeight)
+        .margins({ top: 10, right: 50, bottom: 30, left: 80 })
         .x(d3.scale.linear().domain([minValueOne, maxValueOne]))
         .y(d3.scale.linear().domain([minValueTwo, maxValueTwo]))
         .brushOn(false)
-        .symbolSize(5)
+        .symbolSize(7)
         .clipPadding(10)
-        .xAxisLabel(getXAxisLabel(selectorValueTwo))
-        .yAxisLabel(getYAxisLabel(selectorValue))
-        .colors("#31FFAB")
+        .xAxisLabel(getXAxisLabel(selectorValue))
+        .yAxisLabel(getYAxisLabel(selectorValueTwo))
+        .colors("#4596FF")
         .dimension(litDim)
         .group(litGroup);
 }

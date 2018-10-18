@@ -1,23 +1,255 @@
-body{
+/* ----------- PAGE STYLING ----------- */
+
+body {
     background-color: #161724;
+    overflow-x: hidden;
+}
+ol {
+    color: white;
+}
+p{
+    color: white;
+    opacity: 0.7;
+    display: block;
+}
+h2 {
+    font-family: acumin-pro, sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    text-align: center;
+    margin-bottom: 25px;
 }
 
-.bar:nth-child(1){
+h4 {
+    font-family: acumin-pro, sans-serif;
+    color: white;
+    display: block;
+}
+
+#landing {
+    height: 100vh;
+    background: url("../images/landing.jpg") no-repeat center center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    position: relative;
+}
+
+/* nav */
+
+nav {
+    background-color: #1E1E2F;
+    height: 50px;
+    display: flex;
+    margin: 0;
+    -webkit-box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.5);
+    justify-content: center;
+}
+
+h3 {
+    font-family: acumin-pro, sans-serif;
+    text-transform: uppercase;
+    font-size: 22px;
+    color: white;
+    margin: auto;
+    text-align: center;
+}
+
+span {
+    font-weight: 800;
+}
+
+#globe {
+    color: #31FFAB;
+    font-size: 24px;
+}
+
+.btn {
+    font-size: 16px;
+    background-color: #2CE599;
+    color: white;
+    transition: all .2s ease-in-out;
+}
+.btn:hover{
+    color: white;
+    background-color: #31FFAB;
+}
+
+/* /nav */
+.refresh-btn{
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 5px;
+    -webkit-box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.5);
+    margin: 0 auto;
+    display: block;
+}
+.refresh-btn:hover {
+    -webkit-box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.5);
+}
+#scatterOne{
+    background-color: #2CE599;
+}
+#scatterTwo{
+    background-color: #4596FF;
+}
+.second-select{
+    float: right;
+}
+/* ----------- Footer ----------- */
+footer{
+    background-color: #2CE599;
+    padding: 50px;
+    margin-top: 50px;
+}
+footer i{
+    color: white;
+}
+footer a{
+    color: #161724;
+    transition: all .3s ease-in-out;
+}
+footer a:hover{
+    text-decoration: none;
+    color: white;
+}
+h5{
+    font-family: acumin-pro, sans-serif;
+    font-size: 16px;
+    color: #161724;
+}
+
+/* ----------- /Footer ----------- */
+/* Modal Styles*/
+.modal-header{
+    background-color: #1E1E2F;
+    -webkit-box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.5);
+    border: none;
+}
+.modal-title{
+    font-family: acumin-pro, sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+}
+.modal-btn {
+    background-color: #1E1E2F;
+    color: white;
+    transition: all .2s ease-in-out;
+    -webkit-box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.5);
+}
+
+.modal-btn:hover {
+    -webkit-box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+
+/* /Modal Styles*/
+
+/* ----------- RESPONSIVE ----------- */
+
+@media screen and (min-width: 769px) {
+    .graph-bg {
+        background-color: #1E1E2F;
+        -webkit-box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.5);
+        -moz-box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.5);
+        box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        margin-bottom: 50px;
+        padding: 25px;
+        transition: all 1s ease-in-out;
+    }
+}
+@media screen and (min-width: 1280px){
+    h4{
+        display: inline-block;
+    }
+}
+/* ----------- /RESPONSIVE ----------- */
+
+/* ----------- /PAGE STYLING ----------- */
+
+/* ----------- CHART STYLING ----------- */
+
+.bar:nth-child(1) {
     fill: #19A1FB;
 }
-.bar:nth-child(2){
+
+.bar:nth-child(2) {
     fill: #5863F7;
 }
-.bar:nth-child(3){
+
+.bar:nth-child(3) {
     fill: #9326FF;
 }
-.bar:nth-child(4){
+
+.bar:nth-child(4) {
     fill: #EC58F7;
 }
 
-.axis{
+.bar:nth-child(5) {
+    fill: #43FFEC;
+}
+
+.bar:nth-child(6) {
+    fill: #FF4388;
+}
+
+.bar:nth-child(7) {
+    fill: #19A1FB;
+}
+
+.bar:nth-child(8) {
+    fill: #5863F7;
+}
+
+.bar:nth-child(9) {
+    fill: #9326FF;
+}
+
+.bar:nth-child(10) {
+    fill: #EC58F7;
+}
+
+.axis {
     fill: white;
 }
-#most-pop-countries path, #most-rich-countries path, #show-correlation-one path, #show-correlation-two path{
+
+#most-pop-countries path,
+#most-rich-countries path,
+#show-correlation-one path,
+#show-correlation-two path,
+#landing-graph path {
     stroke: white;
 }
+
+#most-pop-countries text,
+#most-rich-countries text,
+#show-correlation-one text,
+#show-correlation-two text,
+#landing-graph text {
+    fill: white;
+}
+
+#landing-graph .x.axis text, #most-pop-countries .x.axis text, #most-rich-countries .x.axis text  {
+    text-anchor: start !important;
+    transform: rotate(45deg);
+}
+
+/* ----------- /CHART STYLING ----------- */
