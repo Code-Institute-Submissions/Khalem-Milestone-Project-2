@@ -24,17 +24,35 @@ function makeGraphs(error, countryData) {
         d.populationDensity = parseFloat(d["Pop. Density (per sq. mi.)"], 10);
         d.birthrate = parseFloat(d.Birthrate, 10);
         d.deathrate = parseFloat(d.Deathrate, 10);
-        d.industry = parseFloat(d.Industry);
-        d.service = parseFloat(d.Service);
-        d.agriculture = parseFloat(d.Agriculture);
-        d.popDensity = parseFloat(d.popDensity);
-        d.netMigration = parseFloat(d.netMigration);
-        d.phones = parseFloat(d.phones);
-        d.area = parseInt(d["Area (sq. mi.)"]);
-        //If there is no value for literacy, change it to 0.
+        d.industry = parseFloat(d.Industry, 10);
+        d.service = parseFloat(d.Service, 10);
+        d.agriculture = parseFloat(d.Agriculture, 10);
+        d.popDensity = parseFloat(d.popDensity, 10);
+        d.netMigration = parseFloat(d.netMigration, 10);
+        d.phones = parseFloat(d.phones, 10);
+        d.area = parseInt(d["Area (sq. mi.)"], 10);
+        //Data cleaning - getting rid of invalid values
         if (!d.literacy) {
             d.literacy = 0;
-        }
+        } else if(!d.populationDensity){
+            d.populationDensity = 0;
+        } else if(!d.birthrate){
+            d.birthrate = 0;
+        } else if(!d.deathrate){
+            d.deathrate = 0;
+        } else if(!d.industry){
+            d.industry = 0;
+        } else if(!d.service){
+            d.service = 0;
+        } else if(!d.agriculture){
+            d.agriculture = 0;
+        } else if(!d.popDensity){
+            d.popDensity = 0;
+        } else if(!d.netMigration){
+            d.netMigration = 0;
+        } else if(!d.phones){
+            d.phones = 0;
+        } 
         //If there is no value for Climate, or if value was invalid - change to 5.
         if(isNaN(d.Climate) == true){
             d.Climate = 5;
@@ -45,9 +63,8 @@ function makeGraphs(error, countryData) {
     //Get height and width of window
     var width = $(window).width();
     var height = $(window).height();
-    console.log(height);
-    console.log(width);
-
+    
+    // Render graphs
     showLandingGraph(ndx, "#landing-graph", width, height);
     showPopPercent(ndx, "#pop-percent", colorScale);
     showLandLockedPercent(ndx, "#landlocked-percent", colorScale);
@@ -57,21 +74,19 @@ function makeGraphs(error, countryData) {
     showCorrelationTwo(ndx, "#show-correlation-two", width, height);
 
     dc.renderAll();
+    
     //Each time a select is changed, graphs will re-render displaying new info
     $("#landingSelect").change(function() {
         showLandingGraph(ndx, "#landing-graph", width, height);
         dc.renderAll();
-        console.log("TESTEST");
     });
     $("#chartOneSelect").change(function() {
         showTop5PopCountries(ndx, "#most-pop-countries", width, height);
         dc.renderAll();
-        console.log("TESTEST");
     });
     $("#chartTwoSelect").change(function() {
         showTop5RichCountries(ndx, "#most-rich-countries", width, height);
         dc.renderAll();
-        console.log("TESTEST");
     });
     $("#scatterOne").click(function() {
         showCorrelationOne(ndx, "#show-correlation-one", width, height);
@@ -230,11 +245,8 @@ function getYAxisLabel(selectorValue) {
     else if (selectorValue == "Industry") {
         return "Industry";
     }
-    else if (selectorValue == "infantMortality") {
-        return "Infanty Mortality Per 1000";
-    }
     else if (selectorValue == "literacy") {
-        return "Literacy";
+        return "Literacy%";
     }
 }
 //Get dynamic X-Axis labels
@@ -273,11 +285,12 @@ function getXAxisLabel(selectorValueTwo) {
         return "Infanty Mortality Per 1000";
     }
     else if (selectorValueTwo == "literacy") {
-        return "Literacy";
+        return "Literacy %";
     }
 }
 //First Top 5 Bar Chart
 function showTop5PopCountries(ndx, element, width, height) {
+    //Get value from select to then group
     var selector = document.getElementById("chartOneSelect");
     var selectorValue = selector.options[selector.selectedIndex].value;
     var countryDim = ndx.dimension(dc.pluck("Country"));
@@ -311,8 +324,9 @@ function showTop5PopCountries(ndx, element, width, height) {
         .yAxis().ticks(4);
 }
 
-//Second Top 5 Bar Chart - need to add option to choose which piece of data to display
+//Second Top 5 Bar Chart
 function showTop5RichCountries(ndx, element, width, height) {
+    //Get value from select to then group
     var selector = document.getElementById("chartTwoSelect");
     var selectorValue = selector.options[selector.selectedIndex].value;
 
@@ -350,13 +364,13 @@ function showTop5RichCountries(ndx, element, width, height) {
 
 //First Scatter Plot
 function showCorrelationOne(ndx, element, width, height) {
+    //Get values from 2 selects to plot
     var selectorOne = document.getElementById("scatterOneFirstSelect");
     var selectorValue = selectorOne.options[selectorOne.selectedIndex].value;
 
     var selectorTwo = document.getElementById("scatterOneSecondSelect");
     var selectorValueTwo = selectorTwo.options[selectorTwo.selectedIndex].value;
 
-    console.log(typeof selectorValueOne);
     //Create array with all values, then get min and max values.
     var valueArrayOne = [];
     var valueArrayTwo = [];
@@ -374,7 +388,7 @@ function showCorrelationOne(ndx, element, width, height) {
 
     var litGroup = litDim.group().reduceCount();
     
-    
+    //Creating custom width to scale for different devices
     var newWidth;
     var newHeight;
     
@@ -389,7 +403,7 @@ function showCorrelationOne(ndx, element, width, height) {
     dc.scatterPlot(element)
         .width(newWidth)
         .height(newHeight)
-        .margins({ top: 10, right: 50, bottom: 30, left: 80 })
+        .margins({ top: 10, right: 50, bottom: 80, left: 80 })
         .x(d3.scale.linear().domain([minValueOne, maxValueOne]))
         .y(d3.scale.linear().domain([minValueTwo, maxValueTwo]))
         .brushOn(false)
@@ -403,6 +417,7 @@ function showCorrelationOne(ndx, element, width, height) {
 }
 //Second Scatter Plot
 function showCorrelationTwo(ndx, element, width, height) {
+    //Get values from 2 selects to plot
     var selectorOne = document.getElementById("scatterTwoFirstSelect");
     var selectorValue = selectorOne.options[selectorOne.selectedIndex].value;
 
@@ -427,6 +442,7 @@ function showCorrelationTwo(ndx, element, width, height) {
     var minValueTwo = Math.min(...valueArrayTwo);
     var maxValueTwo = Math.max(...valueArrayTwo);
     
+    //Creating custom width to scale for different devices
     var newWidth;
     var newHeight;
     
@@ -443,7 +459,7 @@ function showCorrelationTwo(ndx, element, width, height) {
     dc.scatterPlot(element)
         .width(newWidth)
         .height(newHeight)
-        .margins({ top: 10, right: 50, bottom: 30, left: 80 })
+        .margins({ top: 10, right: 50, bottom: 80, left: 80 })
         .x(d3.scale.linear().domain([minValueOne, maxValueOne]))
         .y(d3.scale.linear().domain([minValueTwo, maxValueTwo]))
         .brushOn(false)

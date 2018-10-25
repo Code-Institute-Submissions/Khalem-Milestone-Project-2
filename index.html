@@ -25,6 +25,7 @@
 
 <body>
     <header>
+        <!------------Nav Bar----------->
         <div class="row">
             <div class="col-xs-12">
                 <nav>
@@ -35,9 +36,12 @@
                 </nav>
             </div>
         </div>
+        <!------------/Nav Bar----------->
+        
+        <!------------Landing Graph----------->
         <div id="landing">
             <div class="row">
-                <h2>Region Selector</h2>
+                <div class="col-xs-12"><h2>Region Selector</h2></div>
             </div>
             <div class="row">
                 <div class="col-xs-12 col-lg-offset-2 col-lg-10">
@@ -59,9 +63,11 @@
                     <div id="landing-graph"></div>
                 </div>
             </div>
-
+        <!------------/Landing Graph----------->
+        
+        <!------------Pie Charts----------->
             <div class="row">
-                <h2>Population</h2>
+                <div class="col-xs-12"><h2>Population</h2></div>
             </div>
             <div class="row">
                 <div class="col-xs-12 col-md-6 col-lg-offset-1 col-lg-4 col-xl-offset-1 col-xl-4 graph-bg">
@@ -71,7 +77,6 @@
                 </div>
                 <div class="col-xs-12 col-md-6 col-lg-offset-2 col-lg-4 col-xl-offset-2 col-xl-4 graph-bg">
                     <div id="landlocked-percent"></div>
-                    <br/>
                     <h4 class="text-center">Types of Climate</h4>
                     <p class=text-center><strong>This chart shows the amount of countries in certain climates. Below is the classification for these climates.</strong></p>
                     <ol>
@@ -83,11 +88,13 @@
                     </ol>
                 </div>
             </div>
+            <!------------/Pie Charts----------->
         </div>
     </header>
-    <div class="row"></div>
+    
+            <!------------Bar Charts----------->
     <div class="row">
-        <h2>Top 5</h2>
+        <div class="col-xs-12"><h2>Top 5</h2></div>
     </div>
     <div class="row">
         <div class="col-xs-12 col-md-6 col-lg-offset-1 col-lg-4 graph-bg">
@@ -125,8 +132,11 @@
             </div>
         </div>
     </div>
+            <!------------/Bar Charts----------->
+            
+            <!------------Scatter Charts----------->
     <div class="row">
-        <h2>Finding Correlation</h2>
+        <div class="col-xs-12"><h2>Finding Correlation</h2></div>
     </div>
     <div class="row">
         <div class="col-xs-12 col-lg-offset-1 col-lg-10 graph-bg">
@@ -197,10 +207,9 @@
             <div id="show-correlation-two"></div>
         </div>
     </div>
-
-    <div id="country-selector"></div>
-    <div id="region-selector"></div>
-
+            <!------------/Scatter Charts----------->
+            
+            <!------------Footer----------->
     <footer>
         <div class="row">
             <div class="col-xs-6 col-md-4 text-center">
@@ -214,8 +223,8 @@
             </div>
         </div>
     </footer>
-
-    <!-- Modal -->
+            <!------------/Footer----------->
+    <!-- Modal to explain how it works-->
     <div class="modal fade" id="information" tabindex="-1" role="dialog" aria-labelledby="informationTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -226,7 +235,17 @@
         </button>
                 </div>
                 <div class="modal-body">
-
+                    <h3 class="modal-h3">Select Boxes</h3>
+                    <img  class="modal-img" src="assets/images/how-it-works-1.jpg">
+                    <p>Selecting a different option will update only the chart associated with it.</p>
+                    <h3 class="modal-h3">Selecting Region</h3>
+                    <img  class="modal-img" src="assets/images/how-it-works-2.jpg">
+                    <p>Selecting on a different region on the landing chart will update all charts on this dashboard.</p>
+                    <h3 class="modal-h3">Selecting Country</h3>
+                    <img  class="modal-img" src="assets/images/how-it-works-3.jpg">
+                    <p>By clicking on a country on one of the charts will update all other charts with only the selected country</p>
+                    <h3 class="modal-h3">Side Notes</h3>
+                    <p>Note that with the data provided, some values for certain countries were not given. Also, city-states such as Monaco were included in this data set which will affect certain charts. If you wish to see the data you can do so <a href="https://www.kaggle.com/fernandol/countries-of-the-world" target="_blank">here!</a></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn modal-btn" data-dismiss="modal">Okay!</button>

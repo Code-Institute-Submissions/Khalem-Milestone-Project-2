@@ -3,15 +3,19 @@
 body {
     background-color: #161724;
     overflow-x: hidden;
+    padding: 15px;
 }
+
 ol {
     color: white;
 }
-p{
+
+p {
     color: white;
     opacity: 0.7;
     display: block;
 }
+
 h2 {
     font-family: acumin-pro, sans-serif;
     font-size: 24px;
@@ -24,7 +28,6 @@ h2 {
 h4 {
     font-family: acumin-pro, sans-serif;
     color: white;
-    display: block;
 }
 
 #landing {
@@ -43,7 +46,7 @@ nav {
     background-color: #1E1E2F;
     height: 50px;
     display: flex;
-    margin: 0;
+    margin: 0 auto;
     -webkit-box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.5);
     -moz-box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.5);
     box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.5);
@@ -74,13 +77,15 @@ span {
     color: white;
     transition: all .2s ease-in-out;
 }
-.btn:hover{
+
+.btn:hover {
     color: white;
     background-color: #31FFAB;
 }
 
 /* /nav */
-.refresh-btn{
+
+.refresh-btn {
     color: white;
     border: none;
     border-radius: 3px;
@@ -91,58 +96,72 @@ span {
     margin: 0 auto;
     display: block;
 }
+
 .refresh-btn:hover {
     -webkit-box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.5);
     -moz-box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.5);
     box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.5);
 }
-#scatterOne{
+
+#scatterOne {
     background-color: #2CE599;
 }
-#scatterTwo{
+
+#scatterTwo {
     background-color: #4596FF;
 }
-.second-select{
+
+.second-select {
     float: right;
 }
+
 /* ----------- Footer ----------- */
-footer{
+
+footer {
     background-color: #2CE599;
     padding: 50px;
     margin-top: 50px;
 }
-footer i{
+
+footer i {
     color: white;
 }
-footer a{
+
+footer a {
     color: #161724;
     transition: all .3s ease-in-out;
 }
-footer a:hover{
+
+footer a:hover {
     text-decoration: none;
     color: white;
 }
-h5{
+
+h5 {
     font-family: acumin-pro, sans-serif;
     font-size: 16px;
     color: #161724;
 }
 
 /* ----------- /Footer ----------- */
+
 /* Modal Styles*/
-.modal-header{
+
+.modal-header {
     background-color: #1E1E2F;
     -webkit-box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.5);
     -moz-box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.5);
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.5);
     border: none;
 }
-.modal-title{
+
+.modal-title {
     font-family: acumin-pro, sans-serif;
     font-size: 24px;
     font-weight: 700;
     color: white;
 }
+
 .modal-btn {
     background-color: #1E1E2F;
     color: white;
@@ -159,6 +178,26 @@ h5{
     color: white;
 }
 
+.modal-h3 {
+    font-family: acumin-pro, sans-serif;
+    font-weight: 700;
+    color: #1E1E2F;
+    margin-bottom: 30px;
+}
+
+.modal-body p {
+    font-family: acumin-pro, sans-serif;
+    color: #161724;
+    margin-bottom: 30px;
+}
+.modal-body p a:hover{
+    color: #31FFAB;
+}
+.modal-img {
+    max-width: 100%;
+    max-height: 100%;
+    margin-bottom: 20px;
+}
 
 /* /Modal Styles*/
 
@@ -176,11 +215,13 @@ h5{
         transition: all 1s ease-in-out;
     }
 }
-@media screen and (min-width: 1280px){
-    h4{
+
+@media screen and (min-width: 1280px) {
+    h4 {
         display: inline-block;
     }
 }
+
 /* ----------- /RESPONSIVE ----------- */
 
 /* ----------- /PAGE STYLING ----------- */
@@ -247,7 +288,11 @@ h5{
     fill: white;
 }
 
-#landing-graph .x.axis text, #most-pop-countries .x.axis text, #most-rich-countries .x.axis text  {
+#landing-graph .x.axis text,
+#most-pop-countries .x.axis text,
+#most-rich-countries .x.axis text,
+#show-correlation-one .x.axis text,
+#show-correlation-two .x.axis text {
     text-anchor: start !important;
     transform: rotate(45deg);
 }
